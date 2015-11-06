@@ -1,0 +1,210 @@
+import pygame
+from pygame.locals import *
+
+
+
+full_move_list = []
+active_move_list = []
+
+
+def player_move(turn):
+	
+
+	if turn % 2 == 0:
+		player = 1
+	else:
+		player = 2
+	
+	return player
+	
+	
+	
+def make_board():
+	board = [[[0, x, y] for y in range(0,19)]for x in range(0,19)]
+	# y is vertical (index[1]) x is horizontal (index[2])
+	return board
+
+def print_board(board):
+	for row in board:
+		print row
+   
+   
+def gameplay_logic(board, player):
+	
+	if player == 1:
+		enemy_piece = 2
+	else:
+		enemy_piece = 1
+		
+	for row in board:
+		for index in row:
+			temp_list = []
+	     		if index[0] == enemy_piece:
+				temp_list.append([index[0], index[1], index[2]])
+				search_all(enemy_piece, board, index[1], index[2], temp_list)
+			else:
+				pass
+	       	
+def search_all(enemy_piece, board, vertical_index, horizontal_index, temp_list):
+	found = True
+	while found:
+		found = False
+  		for item in temp_list:
+			found_right_piece = search_right(board, item[1], item[2] )
+			print "47 {}".format(found_right_piece) 
+			if found_right_piece and found_right_piece not in temp_list and found_right_piece[0] == enemy_piece:
+				print "49 {} ".format(temp_list)
+				temp_list.append([found_right_piece[0], found_right_piece[1], found_right_piece[2]])
+				found = True
+			print "53 {} ".format(temp_list)
+			
+
+		for item in temp_list:
+			found_down_piece = search_down(board, item[1], item[2] )
+			if found_down_piece and found_down_piece not in temp_list and found_down_piece[0] == enemy_piece:
+				temp_list.append([found_down_piece[0], found_down_piece[1], found_down_piece[2]])
+				found = True
+
+		for item in temp_list:
+			found_left_piece = search_left(board, item[1], item[2] )
+			if found_left_piece and found_left_piece not in temp_list and found_left_piece[0] == enemy_piece:
+				temp_list.append([found_left_piece[0], found_left_piece[1], found_left_piece[2]])
+				found = True
+
+		for item in temp_list:
+			found_up_piece = search_up(board, item[1], item[2] )
+			if found_up_piece and found_up_piece not in temp_list and found_up_piece[0] == enemy_piece:
+				temp_list.append([found_up_piece[0], found_up_piece[1], found_up_piece[2]])
+				found = True
+	print "72 {} ".format(temp_list)
+	perimeter_ammend(board, enemy_piece, temp_list)	
+	print "74 {} ".format(temp_list)
+
+
+def search_right(board, vertical_index, horizontal_index):
+	if board[vertical_index][horizontal_index][2] == 18:
+	    found_piece = [99,99,99]
+	else:
+	    found_piece = board[vertical_index][horizontal_index+1]
+        return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+      
+def search_down(board, vertical_index, horizontal_index):
+	if board[vertical_index][horizontal_index][1] == 18:
+	    found_piece = [99, 99, 99]
+	else:
+ 	    found_piece = board[vertical_index+1][horizontal_index]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def search_left(board, vertical_index, horizontal_index):
+	if board[vertical_index][horizontal_index][2] == 0:
+	   found_piece = [99, 99, 99]
+	else:
+  	     found_piece = board[vertical_index][horizontal_index-1]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def search_up(board, vertical_index, horizontal_index):
+	if board[vertical_index][horizontal_index][1] == 0:
+  	    found_piece = [99, 99, 99]
+	else:
+            found_piece = board[vertical_index-1][horizontal_index]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def perimeter_ammend(board, enemy_piece, temp_list):
+	for i in range(0, len(temp_list)):
+		print "96 {}".format(temp_list)
+		temp_list.append(search_right(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_down(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_left(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_up(board, temp_list[i][1], temp_list[i][2]))
+	liberty = False	
+	for i in range(0, len(temp_list)):
+		if temp_list[i][0] == 0:
+			liberty = True
+		else:
+			pass
+	if not liberty:
+		for i in range(0, len(temp_list)):
+			if temp_list[i][0] == enemy_piece:
+				board[temp_list[i][1]][temp_list[i][2]][0] = 0
+			else:
+				pass
+
+
+def mouse_processing():
+    board_position_x = "no click"
+    board_position_y = "no click"
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_position = pygame.mouse.get_pos()
+            board_position_x = mouse_position[0] / 50
+            board_position_y = mouse_position[1] / 50
+            print "\nHORIZONTAL" + str(board_position_x)
+            print "VERTICAL" + str(board_position_y)
+            break
+      	else:
+      	    pass
+    return board_position_x, board_position_y    
+      		
+def circle_generate(screen, position_x, position_y, player, board):
+
+    for row in board:
+        for i in row:
+	    if i[0] == 2:
+		colour = (255,255,255)
+	    else:
+		colour = (0,0,0,)
+
+
+    	    if i[0] == 1 or i[0] == 2:
+    	    	pygame.draw.circle(screen, colour, (25 + i[2] * 50, 25 + i[1] * 50), 25, 0) 
+	    else:
+		pass
+    	    	
+    
+    
+    #if player == 1:
+    #    colour = (0,0,0)
+    #else:
+    #	colour = (255,255,255)
+    #pygame.draw.circle(screen, colour, (25 + position_x * 50, 25 + position_y * 50), 25, 0) 
+
+
+def main():
+	pygame.init()
+	screen = pygame.display.set_mode((950,950))
+	go_graph_board = pygame.image.load('Blank_Go_board.png')
+	stop_play = False
+	board = make_board()
+	turn = 0
+	screen.blit(go_graph_board, (0, 0))
+	
+	while not stop_play:
+	    pygame.display.update()
+	    player = player_move(turn)
+	  
+	    
+	    position_x, position_y = mouse_processing()
+	    if position_x == "no click":
+		continue
+	    else:
+		screen.blit(go_graph_board, (0, 0))
+		
+	        board[position_y][position_x][0] = player
+	        
+	        #print "TURN: {}".format(turn)
+	        pygame.display.update()
+	        gameplay_logic(board, player)
+		circle_generate(screen, position_x, position_y, player, board)
+		print_board(board)
+	        print "\n\n"
+	        turn += 1
+	        print turn
+	        print player
+	pygame.display.update()
+
+main()
+
+
+
+
+
