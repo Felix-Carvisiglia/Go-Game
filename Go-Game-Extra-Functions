@@ -1,0 +1,161 @@
+full_move_list = []
+active_move_list = []
+
+
+def player_move(turn,board):
+	
+
+	if turn % 2 == 0:
+		player = 1
+	else:
+		player = 2
+	print "Player {}'s Turn".format(player)
+	play = 0
+	while play < 1:
+		play_pass = raw_input("Play or pass: ").lower()
+		if play_pass == "play" or play_pass == "":
+			index1 = int(raw_input("Enter vertical index 1-9: "))
+			index2 = int(raw_input("Enter horizontal index 1-9: "))
+			if board[index2][index1][0] != 0:
+				print "Sorry that space is taken, GO SOMEWHERE ELSE"
+				continue
+			else:			
+				#if full_move_list[turn-2][1][2] = [index2][index1]:
+				#	print "YOU ARE BREAKING KO, TRY AGAIN"
+				#	continue
+				if True :	
+					play += 1
+					full_move_list.append([player, index2, index1])
+					active_move_list.append([player, index2, index1])
+					print "18 {}".format(full_move_list)
+					return player, index1, index2	
+
+		#return chosen index
+		elif play_pass == "pass":
+			play += 1
+			return 5,5,5
+		else:
+			pass
+	
+
+def make_board():
+	board = [[[0, x, y] for y in range(0,9)]for x in range(0,9)]
+	# y is vertical (index[1]) x is horizontal (index[2])
+	return board
+
+def print_board(board):
+	for row in board:
+		print row
+   
+   
+def gameplay_logic(board, player):
+	
+	if player == 1:
+		enemy_piece = 2
+	else:
+		enemy_piece = 1
+		
+	for row in board:
+		for index in row:
+			temp_list = []
+	     		if index[0] == enemy_piece:
+				temp_list.append([index[0], index[1], index[2]])
+				search_all(enemy_piece, board, index[1], index[2], temp_list)
+			else:
+				pass
+	       	
+def search_all(enemy_piece, board, vertical_index, horizontal_index, temp_list):
+	found = True
+	while found:
+		found = False
+  		for item in temp_list:
+			found_right_piece = search_right(board, item[1], item[2] )
+			print "47 {}".format(found_right_piece) 
+			if found_right_piece and found_right_piece not in temp_list and found_right_piece[0] == enemy_piece:
+				print "49 {} ".format(temp_list)
+				temp_list.append([found_right_piece[0], found_right_piece[1], found_right_piece[2]])
+				found = True
+			print "53 {} ".format(temp_list)
+			
+
+		for item in temp_list:
+			found_down_piece = search_down(board, item[1], item[2] )
+			if found_down_piece and found_down_piece not in temp_list and found_down_piece[0] == enemy_piece:
+				temp_list.append([found_down_piece[0], found_down_piece[1], found_down_piece[2]])
+				found = True
+
+		for item in temp_list:
+			found_left_piece = search_left(board, item[1], item[2] )
+			if found_left_piece and found_left_piece not in temp_list and found_left_piece[0] == enemy_piece:
+				temp_list.append([found_left_piece[0], found_left_piece[1], found_left_piece[2]])
+				found = True
+
+		for item in temp_list:
+			found_up_piece = search_up(board, item[1], item[2] )
+			if found_up_piece and found_up_piece not in temp_list and found_up_piece[0] == enemy_piece:
+				temp_list.append([found_up_piece[0], found_up_piece[1], found_up_piece[2]])
+				found = True
+	print "72 {} ".format(temp_list)
+	perimeter_ammend(board, enemy_piece, temp_list)	
+	print "74 {} ".format(temp_list)
+
+
+def search_right(board, vertical_index, horizontal_index):
+	found_piece = board[vertical_index][horizontal_index+1]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+      
+def search_down(board, vertical_index, horizontal_index):
+  	found_piece = board[vertical_index-1][horizontal_index]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def search_left(board, vertical_index, horizontal_index):
+  	found_piece = board[vertical_index][horizontal_index-1]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def search_up(board, vertical_index, horizontal_index):
+  	found_piece = board[vertical_index+1][horizontal_index]
+      	return found_piece # THIS WILL BE ADDED TO OUR DICTIONARY
+
+def perimeter_ammend(board, enemy_piece, temp_list):
+	for i in range(0, len(temp_list)):
+		print "95 {}".format(temp_list[i][1])
+		print "96 {}".format(temp_list)
+		temp_list.append(search_right(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_down(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_left(board, temp_list[i][1], temp_list[i][2]))
+		temp_list.append(search_up(board, temp_list[i][1], temp_list[i][2]))
+	liberty = False	
+	for i in range(0, len(temp_list)):
+		if temp_list[i][0] == 0:
+			liberty = True
+		else:
+			pass
+	if not liberty:
+		for i in range(0, len(temp_list)):
+			if temp_list[i][0] == enemy_piece:
+				board[temp_list[i][1]][temp_list[i][2]][0] = 0
+			else:
+				pass
+
+
+
+
+def main():
+	board = make_board()
+	turn = 0	
+	while True:
+		print_board(board)
+		print "\n\n"
+		player, index1, index2 = player_move(turn, board)
+		if player == 5:
+			turn += 1
+			continue
+		board[index1][index2][0] = player
+		
+		gameplay_logic(board, player)
+
+		turn += 1
+
+main()
+
+
